@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎀 娃哈哈的工作台</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header"><div class="logo"><span class="logo-icon">🎀</span></div></div>
+    <nav class="nav" id="nav">
+      <a class="nav-item active" href="#overview" data-target="overview"><span class="nav-icon">🏠</span><span class="nav-label">总览</span></a>
+      <a class="nav-item" href="#todos" data-target="todos"><span class="nav-icon">📋</span><span class="nav-label">待办记事</span></a>
+      <a class="nav-item" href="#schedule" data-target="schedule"><span class="nav-icon">🗓</span><span class="nav-label">排班</span></a>
+      <a class="nav-item" href="#finance" data-target="finance"><span class="nav-icon">💰</span><span class="nav-label">财管</span></a>
+      <a class="nav-item" href="#fitness" data-target="fitness"><span class="nav-icon">🥗</span><span class="nav-label">减脂</span></a>
+      <a class="nav-item" href="#calendar" data-target="calendar"><span class="nav-icon">📅</span><span class="nav-label">日程</span></a>
+      <a class="nav-item" href="#treasure" data-target="treasure"><span class="nav-icon">🎁</span><span class="nav-label">珍藏</span></a>
+      <a class="nav-item" href="#video" data-target="video"><span class="nav-icon">🎬</span><span class="nav-label">短视频</span></a>
+      <a class="nav-item" href="#diary" data-target="diary"><span class="nav-icon">📖</span><span class="nav-label">随笔</span></a>
+    </nav>
+  </aside>
+
+  <main class="main" id="main">
+    <header class="topbar">
+      <div class="topbar-left"><h1 class="page-title">🎀 娃哈哈的工作台</h1></div>
+      <div class="topbar-right"><span class="date-display" id="todayDateDisplay"></span><span class="greeting" id="greeting"></span></div>
+    </header>
+
+    <div class="content-scroll" id="contentScroll">
+
+<!-- ===== 总览 ===== -->
+<section class="section" id="overview">
+<div class="section-title">🏠 总览</div>
+
+<!-- 日期天气 + 暖心文案 -->
+<div class="overview-grid">
+  <div class="card card-datetime">
+    <div class="datetime-main">
+      <div class="datetime-left">
+        <div class="datetime-date" id="datetimeDate">--</div>
+        <div class="datetime-lunar" id="datetimeLunar">--</div>
+        <div class="datetime-week" id="datetimeWeek">--</div>
+        <div class="datetime-clock" id="datetimeClock">--:--</div>
+      </div>
+      <div class="datetime-right" id="weatherWidget"><div class="weather-loading">⏳</div></div>
+    </div>
+    <div class="weather-tip" id="weatherTip"></div>
+  </div>
+  <div class="card card-warm"><div class="warm-content"><span class="warm-icon">💖</span><span class="warm-text" id="warmText">每天都是新的开始 ✨</span></div></div>
+</div>
+
+<!-- 醒目额度 -->
+<div class="alert-row">
+  <div class="card-alert money">
+    <div class="alert-label">💰 生活费剩余额度</div>
+    <div class="alert-main"><span class="alert-value" id="overviewBudgetRemaining">¥0.00</span><span class="alert-unit">剩余</span></div>
+    <div class="alert-sub" id="overviewBudgetSub"></div>
+    <div class="alert-bar"><div class="alert-bar-fill" id="budgetBarFill" style="width:0%"></div></div>
+  </div>
+  <div class="card-alert calorie">
+    <div class="alert-label">🥗 热量剩余额度</div>
+    <div class="alert-main"><span class="alert-value" id="overviewCalRemaining">800</span><span class="alert-unit">千卡</span></div>
+    <div class="alert-sub" id="overviewCalSub"></div>
+    <div class="alert-bar"><div class="alert-bar-fill" id="calorieBarFill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- 今日待办汇总 + 今日排班 + 提醒 -->
+<div class="overview-grid">
+  <div class="card card-today">
+    <div class="card-header"><span class="card-icon">☀️</span><span class="card-title">今日待办</span><span class="card-badge" id="overviewTodoBadge">0</span></div>
+    <div class="today-summary" id="overviewTodoSummary"><div class="empty-state">今天没有待办 ✨</div></div>
+  </div>
+
+  <div class="card card-today-shift">
+    <div class="card-header"><span class="card-icon">🗓</span><span class="card-title">今日班次</span></div>
+    <div class="today-shift-info" id="todayShiftInfo"><div class="empty-state">今日无班次记录</div></div>
+  </div>
+
+  <div class="card card-reminders">
+    <div class="card-header"><span class="card-icon">⏰</span><span class="card-title">重点提醒</span></div>
+    <div class="reminders-list">
+      <div class="reminder-item"><span class="reminder-icon">💧</span><span>饮水 每2小时</span><span class="reminder-status">进行中</span></div>
+      <div class="reminder-item"><span class="reminder-icon">🏃</span><span>运动打卡</span><span class="reminder-status" id="reminderSport">待打卡</span></div>
+      <div class="reminder-item"><span class="reminder-icon">📱</span><span>京东/蚂蚁阿福打卡</span><span class="reminder-status" id="reminderPlatform">待打卡</span></div>
+    </div>
+  </div>
+
+  <div class="card card-progress">
+    <div class="card-header"><span class="card-icon">📊</span><span class="card-title">进度概览</span></div>
+    <div class="progress-bars">
+      <div class="progress-item"><div class="progress-label"><span>待办完成率</span><span id="progressTask">0%</span></div><div class="progress-bar"><div class="progress-fill task-fill" id="progressTaskFill" style="width:0%"></div></div></div>
+      <div class="progress-item"><div class="progress-label"><span>储蓄目标</span><span id="progressSave">0%</span></div><div class="progress-bar"><div class="progress-fill save-fill" id="progressSaveFill" style="width:0%"></div></div></div>
+      <div class="progress-item"><div class="progress-label"><span>减脂目标</span><span id="progressFitness">0%</span></div><div class="progress-bar"><div class="progress-fill fitness-fill" id="progressFitnessFill" style="width:0%"></div></div></div>
+    </div>
+  </div>
+
+  <div class="card card-funds">
+    <div class="card-header"><span class="card-icon">💳</span><span class="card-title">资金预览</span></div>
+    <div class="funds-preview">
+      <div class="fund-item"><div class="fund-label">当月可用</div><div class="fund-value" id="overviewMonthlyFund">¥0.00</div></div>
+      <div class="fund-item"><div class="fund-label">储备结余</div><div class="fund-value" id="overviewReserveFund">¥0.00</div></div>
+      <div class="fund-item total"><div class="fund-label">总净资产</div><div class="fund-value" id="overviewTotalNet">¥0.00</div></div>
+    </div>
+  </div>
+
+  <div class="card card-quick">
+    <div class="card-header"><span class="card-icon">⚡</span><span class="card-title">快捷入口</span></div>
+    <div class="quick-grid">
+      <a class="quick-btn" href="#todos"><span class="quick-icon">📋</span>新增待办</a>
+      <a class="quick-btn" href="#fitness"><span class="quick-icon">⚖️</span>录入体重</a>
+      <a class="quick-btn" href="#finance"><span class="quick-icon">💰</span>记收支</a>
+      <a class="quick-btn" href="#video"><span class="quick-icon">🎬</span>视频复盘</a>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== 待办记事（合并） ===== -->
+<section class="section" id="todos">
+<div class="section-title">📋 待办记事 · 完成率 <span id="todosCompletionRate">0%</span></div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="all" onclick="switchTodosTab('all')">📝 全部</button>
+  <button class="tab-btn" data-tab="active" onclick="switchTodosTab('active')">☀️ 待处理</button>
+  <button class="tab-btn" data-tab="done" onclick="switchTodosTab('done')">✅ 已完成</button>
+</div>
+
+<div class="todos-tab active" id="todosTabAll">
+  <div class="card card-form">
+    <div class="form-title">➕ 新增事项</div>
+    <div class="form-row">
+      <div class="form-group"><label>类型</label><select class="form-select" id="todoItemType"><option value="task">🔹 工作任务</option><option value="life">📝 生活琐事</option><option value="note">📌 记事</option><option value="fitness">🥗 减脂打卡</option><option value="video">🎬 短视频计划</option></select></div>
+      <div class="form-group"><label>优先级</label><select class="form-select" id="todoItemPriority"><option value="high">🔴 高</option><option value="medium" selected>🌸 中</option><option value="low">🟢 低</option></select></div>
+    </div>
+    <input type="text" class="form-input" id="todoItemText" placeholder="事项内容">
+    <div class="form-row">
+      <div class="form-group"><label>日期</label><input type="date" class="form-input" id="todoItemDate"></div>
+    </div>
+    <input type="text" class="form-input" id="todoItemNote" placeholder="备注/后续待办（可选）">
+    <button class="btn-primary" onclick="addTodoItem()">+ 添加</button>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-icon">📋</span><span class="card-title">事项列表</span>
+      <input type="text" class="form-input search-inline" id="todosSearch" placeholder="🔍 搜索..." oninput="renderAllTodos()">
+    </div>
+    <div class="task-list" id="allTodosList"></div>
+  </div>
+</div>
+</section>
+
+<!-- ===== 排班 ===== -->
+<section class="section" id="schedule">
+<div class="section-title">🗓 排班</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="add" onclick="switchShiftTab('add')">+ 录入排班</button>
+  <button class="tab-btn" data-tab="view" onclick="switchShiftTab('view')">📋 排班查看</button>
+  <button class="tab-btn" data-tab="stats" onclick="switchShiftTab('stats')">📊 年度统计</button>
+</div>
+
+<div class="shift-tab active" id="shiftTabAdd">
+  <div class="card card-form">
+    <div class="form-title">🗓 录入排班（可批量）</div>
+    <div class="form-row">
+      <div class="form-group"><label>开始日期</label><input type="date" class="form-input" id="shiftStartDate"></div>
+      <div class="form-group"><label>结束日期</label><input type="date" class="form-input" id="shiftEndDate"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>班次类型</label><select class="form-select" id="shiftType"><option value="day">☀️ 白班</option><option value="night">🌙 夜班</option><option value="full">🕐 12小时</option><option value="rest">🏖️ 休班</option></select></div>
+    </div>
+    <input type="text" class="form-input" id="shiftNote" placeholder="备注（可选）">
+    <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">💡 结束日期留空则只录入开始日期当天</div>
+    <button class="btn-primary" onclick="addShiftBatch()">+ 录入排班</button>
+  </div>
+  <div class="card"><div class="card-header"><span class="card-icon">📋</span><span class="card-title">排班记录</span></div><div class="shift-list" id="shiftList"></div></div>
+</div>
+
+<div class="shift-tab" id="shiftTabView">
+  <div class="card"><div class="card-header"><span class="card-icon">📋</span><span class="card-title">本周班次</span></div><div class="shift-week" id="shiftWeekList"></div></div>
+  <div class="card"><div class="card-header"><span class="card-icon">📅</span><span class="card-title">下月班次</span></div><div class="shift-next" id="shiftNextList"></div></div>
+</div>
+
+<div class="shift-tab" id="shiftTabStats">
+  <div class="card"><div class="card-header"><span class="card-icon">📊</span><span class="card-title">年度班次汇总</span></div>
+    <div class="shift-stats" id="shiftStats">
+      <div class="shift-stat-item"><div class="shift-stat-value" id="statDayCount">0</div><div class="shift-stat-label">白班天数</div></div>
+      <div class="shift-stat-item"><div class="shift-stat-value" id="statNightCount">0</div><div class="shift-stat-label">夜班天数</div></div>
+      <div class="shift-stat-item"><div class="shift-stat-value" id="statFullCount">0</div><div class="shift-stat-label">12小时</div></div>
+      <div class="shift-stat-item"><div class="shift-stat-value" id="statRestCount">0</div><div class="shift-stat-label">休班天数</div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== 财管 ===== -->
+<section class="section" id="finance">
+<div class="section-title">💰 财管</div>
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="record" onclick="switchFinanceTab('record')">💳 收支记账</button>
+  <button class="tab-btn" data-tab="saving" onclick="switchFinanceTab('saving')">🏦 储蓄管理</button>
+  <button class="tab-btn" data-tab="report" onclick="switchFinanceTab('report')">📊 财务报告</button>
+</div>
+<div class="finance-tab active" id="financeTabRecord">
+  <div class="card card-form">
+    <div class="form-title">💳 记一笔</div>
+    <div class="form-row"><div class="form-group"><label>类型</label><div class="type-toggle"><button class="type-btn active" data-type="expense" onclick="setFinanceType('expense')">支出</button><button class="type-btn" data-type="income" onclick="setFinanceType('income')">收入</button></div></div></div>
+    <div class="form-row">
+      <div class="form-group"><label>金额</label><input type="number" class="form-input" id="financeAmount" placeholder="0.00" step="0.01"></div>
+      <div class="form-group"><label>分类</label><select class="form-select" id="financeCategory"><optgroup label="收入"><option value="salary">💼 工资</option><option value="bonus">🎁 奖金</option><option value="side">💡 副业</option></optgroup><optgroup label="支出"><option value="food">🍜 饮食</option><option value="housing">🏠 房贷</option><option value="car">🚗 车贷</option><option value="child">👶 育儿</option><option value="transport">🚌 交通</option><option value="daily">🛍️ 日用品</option><option value="medical">💊 医疗</option><option value="other">📦 其他</option></optgroup></select></div>
+    </div>
+    <div class="form-row"><div class="form-group"><label>日期</label><input type="date" class="form-input" id="financeDate"></div></div>
+    <input type="text" class="form-input" id="financeNote" placeholder="备注（可选）">
+    <button class="btn-primary" onclick="addFinance()">+ 记录</button>
+  </div>
+  <div class="card"><div class="card-header"><span class="card-icon">📋</span><span class="card-title">收支记录</span></div><div class="finance-list" id="financeList"></div></div>
+</div>
+<div class="finance-tab" id="financeTabSaving">
+  <div class="card"><div class="card-header"><span class="card-icon">💳</span><span class="card-title">当月资金池</span></div><div class="saving-info"><div class="saving-row"><span>剩余可用</span><span class="saving-value" id="monthlyBalance">¥0.00</span></div><div class="saving-row"><span>当月花销</span><span class="saving-value expense" id="monthlySpent">¥0.00</span></div></div></div>
+  <div class="card card-form">
+    <div class="form-title">🏦 阶段储备池</div>
+    <div class="form-row"><div class="form-group"><label>账户</label><select class="form-select" id="reserveAccount"><option value="emergency">🚨 应急金</option><option value="car">🚗 车贷储备</option><option value="house">🏠 房贷储备</option><option value="education">📚 女儿教育金</option><option value="annual">📅 年度大额</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label>操作</label><div class="type-toggle"><button class="type-btn active" data-type="deposit" onclick="setReserveOp('deposit')">存入</button><button class="type-btn" data-type="withdraw" onclick="setReserveOp('withdraw')">支取</button></div></div><div class="form-group"><label>金额</label><input type="number" class="form-input" id="reserveAmount" placeholder="0.00" step="0.01"></div></div>
+    <button class="btn-primary" onclick="addReserve()">确认操作</button>
+  </div>
+  <div class="card"><div class="card-header"><span class="card-icon">🏦</span><span class="card-title">储备账户</span></div><div class="reserve-list" id="reserveList"></div></div>
+</div>
+<div class="finance-tab" id="financeTabReport">
+  <div class="card"><div class="card-header"><span class="card-icon">📊</span><span class="card-title">收支汇总</span></div><div class="report-stats" id="reportStats"><div class="report-item"><div class="report-label">本月收入</div><div class="report-value income" id="reportIncome">¥0.00</div></div><div class="report-item"><div class="report-label">本月支出</div><div class="report-value expense" id="reportExpense">¥0.00</div></div><div class="report-item"><div class="report-label">本月结余</div><div class="report-value" id="reportBalance">¥0.00</div></div></div></div>
+  <div class="card"><div class="card-header"><span class="card-icon">🏦</span><span class="card-title">净资产</span></div><div class="net-assets" id="netAssets"><div class="asset-row"><span>流动资金</span><span id="assetLiquid">¥0.00</span></div><div class="asset-row"><span>储备资金</span><span id="assetReserve">¥0.00</span></div><div class="asset-row total"><span>总净资产</span><span id="assetTotal">¥0.00</span></div></div></div>
+</div>
+</section>
+
+<!-- ===== 减脂 ===== -->
+<section class="section" id="fitness">
+<div class="section-title">🥗 减脂</div>
+<div class="card card-profile"><div class="card-header"><span class="card-icon">👤</span><span class="card-title">基础档案</span></div><div class="profile-info"><span>身高 157cm</span><span>初始体重 136.8斤</span><span>当前体重 <strong id="currentWeight">136.8</strong>斤</span><span>已减 <strong id="weightLost">0</strong>斤</span></div></div>
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="exercise" onclick="switchFitnessTab('exercise')">🏃 运动</button>
+  <button class="tab-btn" data-tab="weight" onclick="switchFitnessTab('weight')">⚖️ 体重</button>
+  <button class="tab-btn" data-tab="food" onclick="switchFitnessTab('food')">🥬 饮食</button>
+  <button class="tab-btn" data-tab="water" onclick="switchFitnessTab('water')">💧 饮水</button>
+</div>
+<div class="fitness-tab active" id="fitTabExercise">
+  <div class="card card-form">
+    <div class="form-title">🏃 运动记录 · 输入时间自动计算消耗</div>
+    <div class="form-row">
+      <div class="form-group"><label>运动项目</label><select class="form-select" id="exerciseType" onchange="autoCalcExercise()"><option value="run">🏃 跑步</option><option value="walk">🚶 步行</option><option value="stairs">🪜 爬楼梯</option><option value="hulahoop">⭕ 呼啦圈</option><option value="yoga">🧘 瑜伽</option><option value="swim">🏊 游泳</option><option value="gym">💪 健身</option><option value="cycle">🚴 骑行</option></select></div>
+      <div class="form-group"><label>时长(分钟)</label><input type="number" class="form-input" id="exerciseDuration" placeholder="输入时间自动计算" oninput="autoCalcExercise()"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>消耗(千卡) <span style="color:var(--accent-green);font-size:9px;">自动计算</span></label><input type="number" class="form-input" id="exerciseCalories" placeholder="自动"></div>
+      <div class="form-group"><label>日期</label><input type="date" class="form-input" id="exerciseDate"></div>
+    </div>
+    <button class="btn-primary" onclick="addExercise()">+ 记录运动</button>
+  </div>
+  <div class="card"><div class="card-header"><span class="card-icon">📋</span><span class="card-title">运动记录</span></div><div class="exercise-list" id="exerciseList"></div></div>
+</div>
+<div class="fitness-tab" id="fitTabWeight">
+  <div class="card card-form">
+    <div class="form-title">⚖️ 体重记录</div>
+    <div class="form-row"><div class="form-group"><label>体重(斤)</label><input type="number" class="form-input" id="weightValue" placeholder="136.8" step="0.1"></div><div class="form-group"><label>日期</label><input type="date" class="form-input" id="weightDate"></div></div>
+    <button class="btn-primary" onclick="addWeight()">+ 记录体重</button>
+  </div>
+  <div class="card"><div class="card-header"><span class="card-icon">📈</span><span class="card-title">体重趋势</span></div><div class="weight-chart" id="weightChart"></div></div>
+  <div class="card"><div class="card-header"><span class="card-icon">📋</span><span class="card-title">历史记录</span></div><div class="weight-list" id="weightList"></div></div>
+</div>
+<div class="fitness-tab" id="fitTabFood">
+  <div class="card card-form">
+    <div class="form-title">🥬 饮食记录</div>
+    <button class="photo-food-btn" onclick="triggerPhotoFood()">📸 拍照识别食物</button>
+    <div class="photo-preview" id="photoPreview"></div>
+    <div class="form-row"><div class="form-group"><label>食物</label><input type="text" class="form-input" id="foodName" placeholder="输入食物名自动匹配热量"></div><div class="form-group"><label>重量(克)</label><input type="number" class="form-input" id="foodWeight" placeholder="0"></div></div>
+    <div class="form-row"><div class="form-group"><label>热量(千卡) <span style="color:var(--accent-green);font-size:9px;">自动</span></label><input type="number" class="form-input" id="foodCalories" placeholder="自动匹配"></div><div class="form-group"><label>餐次</label><select class="form-select" id="foodMeal"><option value="breakfast">🌅 早餐</option><option value="lunch">☀️ 午餐</option><option value="dinner">🌙 晚餐</option><option value="snack">🍪 加餐</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label>日期</label><input type="date" class="form-input" id="foodDate"></div></div>
+    <input type="text" class="form-input" id="foodNote" placeholder="身体感受（可选）">
+    <button class="btn-primary" onclick="addFood()">+ 记录饮食</button>
+  </div>
+  <div class="card"><div class="card-header"><span class="card-icon">📊</span><span class="card-title">今日摄入</span></div><div class="calorie-total"><span id="todayCalories">0</span><span>千卡</span></div></div>
+  <div class="card"><div class="card-header"><span class="card-icon">📋</span><span class="card-title">饮食记录</span></div><div class="food-list" id="foodList"></div></div>
+</div>
+<div class="fitness-tab" id="fitTabWater">
+  <div class="card">
+    <div class="card-header"><span class="card-icon">💧</span><span class="card-title">今日饮水</span></div>
+    <div class="water-tracker"><div class="water-progress"><div class="water-fill" id="waterFill" style="height:0%"></div></div><div class="water-info"><div class="water-count"><span id="waterCount">0</span>/8杯</div><div class="water-total"><span id="waterTotal">0</span>/2000ml</div></div></div>
+    <div class="water-buttons"><button class="water-btn" onclick="drinkWater(250)">🥛 250ml</button><button class="water-btn" onclick="drinkWater(500)">🍶 500ml</button><button class="water-btn" onclick="drinkWater(200)">☕ 200ml</button></div>
+  </div>
+</div>
+</section>
+
+<!-- ===== 日程 ===== -->
+<section class="section" id="calendar">
+<div class="section-title">📅 日程</div>
+<div class="card card-form">
+  <div class="form-title">📅 添加日程</div>
+  <input type="text" class="form-input" id="calEventTitle" placeholder="事项名称">
+  <div class="form-row"><div class="form-group"><label>日期</label><input type="date" class="form-input" id="calEventDate"></div><div class="form-group"><label>时间</label><input type="time" class="form-input" id="calEventTime"></div></div>
+  <div class="form-row"><div class="form-group"><label>地点</label><input type="text" class="form-input" id="calEventLocation" placeholder="地点"></div><div class="form-group"><label>提前提醒</label><select class="form-select" id="calEventReminder"><option value="none">不提醒</option><option value="15">15分钟</option><option value="30" selected>30分钟</option><option value="60">1小时</option><option value="1440">1天</option></select></div></div>
+  <input type="text" class="form-input" id="calEventNote" placeholder="备注">
+  <button class="btn-primary" onclick="addCalendarEvent()">+ 添加日程</button>
+</div>
+<div class="card"><div class="card-header"><span class="card-icon">📋</span><span class="card-title">近期日程</span></div><div class="calendar-event-list" id="calendarEventList"></div></div>
+</section>
+
+<!-- ===== 珍藏 ===== -->
+<section class="section" id="treasure">
+<div class="section-title">🎁 珍藏</div>
+<div class="card card-form">
+  <div class="form-title">🎁 记录珍藏</div>
+  <div class="form-row"><div class="form-group"><label>日期</label><input type="date" class="form-input" id="treasureDate"></div><div class="form-group"><label>类型</label><select class="form-select" id="treasureType"><option value="growth">👧 女儿成长</option><option value="family">👨‍👩‍👧 家庭时刻</option><option value="milestone">🌟 重要节点</option><option value="other">💝 其他</option></select></div></div>
+  <input type="text" class="form-input" id="treasureEvent" placeholder="事件标题">
+  <textarea class="form-textarea" id="treasureContent" placeholder="记录这个珍贵瞬间..."></textarea>
+  <button class="btn-primary" onclick="addTreasure()">+ 保存</button>
+</div>
+<div class="card"><div class="card-header"><span class="card-icon">🎁</span><span class="card-title">珍藏记录</span></div><div class="treasure-list" id="treasureList"></div></div>
+</section>
+
+<!-- ===== 短视频 ===== -->
+<section class="section" id="video">
+<div class="section-title">🎬 短视频</div>
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="inspiration" onclick="switchVideoTab('inspiration')">💡 灵感选题</button>
+  <button class="tab-btn" data-tab="trending" onclick="switchVideoTab('trending')">🔥 爆款二创</button>
+  <button class="tab-btn" data-tab="script" onclick="switchVideoTab('script')">✍️ 脚本生成</button>
+  <button class="tab-btn" data-tab="review" onclick="switchVideoTab('review')">📊 内容复盘</button>
+</div>
+<div class="video-tab active" id="videoTabInspiration">
+  <div class="card"><div class="card-header"><span class="card-icon">✨</span><span class="card-title">今日灵感</span><button class="btn-refresh" onclick="generateInspiration()">🔄 换一批</button></div><div class="inspiration-list" id="inspirationList"></div></div>
+  <div class="card"><div class="card-header"><span class="card-icon">🔥</span><span class="card-title">热点追踪</span></div><div class="trending-topics" id="trendingTopics"></div></div>
+  <div class="card card-form"><div class="form-title">💾 收藏灵感</div><input type="text" class="form-input" id="savedIdea" placeholder="记录喜欢的选题..."><button class="btn-primary" onclick="saveIdea()">+ 收藏</button></div>
+  <div class="card"><div class="card-header"><span class="card-icon">💡</span><span class="card-title">我的收藏</span></div><div class="saved-ideas" id="savedIdeasList"></div></div>
+</div>
+<div class="video-tab" id="videoTabTrending">
+  <div class="card"><div class="card-header"><span class="card-icon">🔥</span><span class="card-title">爆款参考</span></div><div class="video-grid" id="trendingVideos"></div></div>
+  <div class="card card-form"><div class="form-title">🔗 保存参考链接</div><input type="text" class="form-input" id="refLink" placeholder="粘贴抖音/得物链接"><input type="text" class="form-input" id="refTitle" placeholder="视频标题"><button class="btn-primary" onclick="saveRefLink()">+ 保存</button></div>
+  <div class="card"><div class="card-header"><span class="card-icon">📂</span><span class="card-title">参考库</span></div><div class="ref-link-list" id="refLinkList"></div></div>
+</div>
+<div class="video-tab" id="videoTabScript">
+  <div class="card card-form">
+    <div class="form-title">✍️ AI脚本生成 · 可直接制作</div>
+    <input type="text" class="form-input" id="scriptTopic" placeholder="输入选题或关键词，如：省钱技巧、早起挑战...">
+    <div class="form-row">
+      <div class="form-group"><label>风格</label><select class="form-select" id="scriptStyle"><option value="funny">😄 搞笑</option><option value="emotional">😢 情感</option><option value="tutorial">📚 干货</option><option value="vlog">📷 Vlog</option><option value="challenge">🎯 挑战</option></select></div>
+      <div class="form-group"><label>时长</label><select class="form-select" id="scriptDuration"><option value="15">15秒</option><option value="30">30秒</option><option value="60" selected>1分钟</option><option value="180">3分钟</option></select></div>
+    </div>
+    <button class="btn-primary" onclick="generateScript()">✨ 生成完整脚本</button>
+  </div>
+  <div class="card" id="scriptResultCard" style="display:none;">
+    <div class="card-header"><span class="card-icon">🎬</span><span class="card-title">制作脚本</span></div>
+    <div class="script-result" id="scriptResult"></div>
+  </div>
+</div>
+<div class="video-tab" id="videoTabReview">
+  <div class="card card-form">
+    <div class="form-title">📊 发布复盘</div>
+    <input type="text" class="form-input" id="reviewTitle" placeholder="视频标题">
+    <div class="form-row"><div class="form-group"><label>发布时间</label><input type="date" class="form-input" id="reviewDate"></div><div class="form-group"><label>平台</label><select class="form-select" id="reviewPlatform"><option value="douyin">抖音</option><option value="dewu">得物</option><option value="bilibili">B站</option><option value="other">其他</option></select></div></div>
+    <textarea class="form-textarea" id="reviewContent" placeholder="数据表现、优点、缺点、优化方向..."></textarea>
+    <button class="btn-primary" onclick="addReview()">+ 保存复盘</button>
+  </div>
+  <div class="card"><div class="card-header"><span class="card-icon">📊</span><span class="card-title">复盘档案</span></div><div class="review-list" id="reviewList"></div></div>
+</div>
+</section>
+
+<!-- ===== 随笔 ===== -->
+<section class="section" id="diary">
+<div class="section-title">📖 随笔</div>
+<div class="card card-form">
+  <div class="form-title">📖 写随笔</div>
+  <input type="text" class="form-input" id="diaryTitle" placeholder="标题（可选）">
+  <div class="mood-selector"><span class="mood-label">心情：</span>
+    <button class="mood-btn" data-mood="happy" onclick="selectMood('happy')">😊</button><button class="mood-btn" data-mood="calm" onclick="selectMood('calm')">😌</button><button class="mood-btn" data-mood="sad" onclick="selectMood('sad')">😢</button><button class="mood-btn" data-mood="angry" onclick="selectMood('angry')">😠</button><button class="mood-btn" data-mood="excited" onclick="selectMood('excited')">🤩</button><button class="mood-btn" data-mood="tired" onclick="selectMood('tired')">😴</button>
+  </div>
+  <textarea class="form-textarea" id="diaryContent" placeholder="今天发生了什么？..."></textarea>
+  <button class="btn-primary" onclick="addDiary()">+ 保存随笔</button>
+</div>
+<div class="card"><div class="card-header"><span class="card-icon">📚</span><span class="card-title">我的随笔</span></div><div class="diary-list" id="diaryList"></div></div>
+</section>
+
+    </div>
+  </main>
+  <div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
+  <div class="modal" id="analyzeModal"><div class="modal-content"><div class="modal-header"><span class="modal-title">📊 拆解分析</span><button class="modal-close" onclick="closeModal()">✕</button></div><div class="modal-body" id="analyzeContent"></div></div></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
