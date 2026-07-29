@@ -330,7 +330,7 @@ function switchShiftTab(tab) {
   document.querySelector(`#schedule .tab-btn[data-tab="${tab}"]`)?.classList.add('active');
   document.querySelectorAll('#schedule .shift-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('shiftTab'+tab.charAt(0).toUpperCase()+tab.slice(1))?.classList.add('active');
-  if(tab==='view') renderShiftView();
+  if(tab==='view') renderShiftCalendar();
   if(tab==='stats') renderShiftStats();
 }
 
@@ -360,15 +360,14 @@ function addShiftBatch() {
   appData.shifts.sort((a,b)=>b.date.localeCompare(a.date));
   saveData();
   document.getElementById('shiftNote').value='';
-  renderShiftView();
-  renderShiftList();
+  renderShiftCalendar();
   renderShiftStats();
   renderOverview();
 }
 
 function deleteShift(id) {
   appData.shifts = appData.shifts.filter(s=>s.id!==id);
-  saveData();renderShiftView();renderShiftList();renderShiftStats();renderOverview();
+  saveData();renderShiftCalendar();renderShiftStats();renderOverview();
 }
 
 function renderShiftList() {
@@ -383,19 +382,124 @@ function renderShiftList() {
     `).join('');
 }
 
-function renderShiftView() {
-  const td = new Date(today());
-  const ws = new Date(td); ws.setDate(td.getDate()-td.getDay());
-  const we = new Date(ws); we.setDate(ws.getDate()+6);
-  const weekS = appData.shifts.filter(s=>s.date>=formatDate(ws)&&s.date<=formatDate(we));
-  document.getElementById('shiftWeekList').innerHTML = weekS.length===0 ? '<div class="empty-state">本周暂无班次</div>'
-    : weekS.map(s=>`<div class="shift-day-item"><span class="shift-day">${s.date}</span><span class="shift-day-type ${s.type}">${s.type==='day'?'☀️白班':s.type==='night'?'🌙夜班':s.type==='full'?'🕐12小时':'🏖️休班'}</span></div>`).join('');
+// ===== 排班日历 =====
+let shiftCalYear = now().getFullYear();
+let shiftCalMonth = now().getMonth(); // 0-based
 
-  const nm = new Date(td.getFullYear(),td.getMonth()+1,1);
-  const ne = new Date(td.getFullYear(),td.getMonth()+2,0);
-  const nextS = appData.shifts.filter(s=>s.date>=formatDate(nm)&&s.date<=formatDate(ne));
-  document.getElementById('shiftNextList').innerHTML = nextS.length===0 ? '<div class="empty-state">下月暂无班次</div>'
-    : nextS.map(s=>`<div class="shift-day-item"><span class="shift-day">${s.date}</span><span class="shift-day-type ${s.type}">${s.type==='day'?'☀️白班':s.type==='night'?'🌙夜班':s.type==='full'?'🕐12小时':'🏖️休班'}</span></div>`).join('');
+function shiftCalendarMonth(delta) {
+  shiftCalMonth += delta;
+  if (shiftCalMonth > 11) { shiftCalMonth = 0; shiftCalYear++; }
+  if (shiftCalMonth < 0) { shiftCalMonth = 11; shiftCalYear--; }
+  renderShiftCalendar();
+}
+
+function shiftCalendarGoToday() {
+  shiftCalYear = now().getFullYear();
+  shiftCalMonth = now().getMonth();
+  renderShiftCalendar();
+}
+
+function renderShiftCalendar() {
+  const y = shiftCalYear, m = shiftCalMonth;
+  document.getElementById('shiftCalMonth').textContent = `${y}年${m+1}月`;
+
+  // 当月第一天和最后一天
+  const firstDay = new Date(y, m, 1);
+  const lastDay = new Date(y, m+1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startDow = firstDay.getDay(); // 0=Sun, 1=Mon...
+
+  // 调整：周一开始（中国习惯）
+  const startOffset = startDow === 0 ? 6 : startDow - 1;
+
+  // 构建日历格子
+  const cells = [];
+  // 上月填充
+  const prevLastDay = new Date(y, m, 0).getDate();
+  for (let i = startOffset-1; i >= 0; i--) {
+    cells.push({ day: prevLastDay-i, month:'prev' });
+  }
+  // 当月
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, month:'curr' });
+  }
+  // 下月填充（补齐到整行）
+  const remaining = (7 - (cells.length % 7)) % 7;
+  for (let d = 1; d <= remaining; d++) {
+    cells.push({ day: d, month:'next' });
+  }
+
+  // 获取当月所有排班
+  const monthStart = formatDate(new Date(y, m, 1));
+  const monthEnd = formatDate(new Date(y, m+1, 0));
+  const monthShifts = {};
+  appData.shifts.forEach(s => {
+    if (s.date >= monthStart && s.date <= monthEnd) {
+      monthShifts[s.date] = s;
+    }
+  });
+
+  const td = today();
+  const grid = document.getElementById('shiftCalendarGrid');
+  grid.innerHTML = cells.map(c => {
+    let dateStr;
+    if (c.month === 'prev') {
+      dateStr = formatDate(new Date(y, m-1, c.day));
+    } else if (c.month === 'next') {
+      dateStr = formatDate(new Date(y, m+1, c.day));
+    } else {
+      dateStr = formatDate(new Date(y, m, c.day));
+    }
+    const shift = monthShifts[dateStr];
+    const cls = ['cal-day'];
+    if (c.month !== 'curr') cls.push('other-month');
+    if (dateStr === td) cls.push('today');
+    const shiftLabel = shift ? (shift.type==='day'?'白班':shift.type==='night'?'夜班':shift.type==='full'?'12h':'休') : '';
+
+    // 点击日期可以快速录入
+    const clickHandler = c.month === 'curr'
+      ? `onclick="quickShiftDay('${dateStr}')" style="cursor:pointer"`
+      : '';
+
+    return `<div class="${cls.join(' ')}" ${clickHandler}>
+      <span class="cal-day-num">${c.day}</span>
+      ${shiftLabel ? `<span class="cal-day-badge ${shift.type}">${shiftLabel}</span>` : ''}
+    </div>`;
+  }).join('');
+
+  // 当月列表
+  renderShiftMonthList();
+}
+
+function quickShiftDay(dateStr) {
+  // 快速录入：点击日历日期跳转到录入页
+  switchShiftTab('add');
+  document.getElementById('shiftStartDate').value = dateStr;
+  document.getElementById('shiftEndDate').value = dateStr;
+}
+
+function renderShiftMonthList() {
+  const y = shiftCalYear, m = shiftCalMonth;
+  const monthStart = formatDate(new Date(y, m, 1));
+  const monthEnd = formatDate(new Date(y, m+1, 0));
+  const monthS = appData.shifts.filter(s => s.date >= monthStart && s.date <= monthEnd).sort((a,b) => a.date.localeCompare(b.date));
+  document.getElementById('shiftMonthList').innerHTML = monthS.length===0 ? '<div class="empty-state">本月暂无排班</div>'
+    : monthS.map(s => `
+      <div class="shift-day-item">
+        <span class="shift-day">${s.date.slice(5)}</span>
+        <span class="shift-day-type ${s.type}">${s.type==='day'?'☀️白班':s.type==='night'?'🌙夜班':s.type==='full'?'🕐12小时':'🏖️休班'}</span>
+        ${s.note?`<span style="font-size:10px;color:var(--text-muted)">${s.note}</span>`:''}
+        <button class="todo-delete" style="margin-left:auto" onclick="deleteShift('${s.id}')">✕</button>
+      </div>
+    `).join('');
+}
+
+function renderShiftView() {
+  renderShiftCalendar();
+}
+
+function renderShiftList() {
+  // 保留兼容，实际不再使用
 }
 
 function renderShiftStats() {
